@@ -3,6 +3,12 @@ return array(
     // This should be an array of module namespaces used in the application.
     'modules' => array(
         'Application',
+        //'DoctrineModule',
+       // 'DoctrineORMModule',
+        'Auth',
+        
+        
+        
     ),
 
     // These are various options for the listeners attached to the ModuleManager
@@ -60,5 +66,23 @@ return array(
 
    // Initial configuration with which to seed the ServiceManager.
    // Should be compatible with Zend\ServiceManager\Config.
-   // 'service_manager' => array(),
+   'service_manager' => array(
+       
+       
+   ),
+    'doctrine' => array(
+        'connection' => array(
+            // default connection name
+            'orm_default' => array(
+                'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
+                'params' => array(
+                    'host'     => 'localhost',
+                    'port'     => '3306',
+                    'user'     => 'nemesis',
+                    'password' => 'poiu123321',
+                    'dbname'   => 'zf2',
+                )
+            )
+        )
+    ),
 );
