@@ -7,19 +7,19 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Auth;
+namespace Users;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-use Auth\Acl\Acl;
+use Users\Acl\Acl;
 
 class Module implements AutoloaderProviderInterface
 {
     public function getAutoloaderConfig()
     {
         return array(
-      
+          
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
 		    // if we're in a namespace deeper than one level we need to fix the \ in the path
@@ -33,8 +33,8 @@ class Module implements AutoloaderProviderInterface
     {
         return include __DIR__ . '/config/module.config.php';
     }
-
-  public function onBootstrap(\Zend\EventManager\EventInterface $e) // use it to attach event listeners
+    // FOR Authorization
+	public function onBootstrap(\Zend\EventManager\EventInterface $e) // use it to attach event listeners
 	{
 		$application = $e->getApplication();
 		$em = $application->getEventManager();
@@ -90,4 +90,6 @@ class Module implements AutoloaderProviderInterface
 			exit;
 		}
 	}
+
+    
 }
