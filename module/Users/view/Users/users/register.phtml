@@ -1,8 +1,10 @@
 <?php
+$this->headTitle('Registracija');
+$this->headMeta()->appendName('description', 'Registrujete se na nasem sajtu i uronite u svet popusta i akcija');
 $form = $this->form;
 
 
-$form->setAttribute('users', $this->url('users', array('controller' => 'users', 'action' => 'update', 'id' => $id)));
+$form->setAttribute('action', $this->url('users/default', array('controller' => 'users', 'action' => 'register')));
 $form->setAttribute('method', 'post');
 $form->setAttribute('class', 'form-signin');
 $form->setAttribute('role', 'form');
@@ -20,6 +22,13 @@ echo $this->form()->openTag($form); ?>
 echo $this->formRow($form->get('username'));
 ?>
 </p>
+
+<p>
+<?php echo $this->formRow($form->get('password')); ?>
+</p>
+<p>
+<?php echo $this->formRow($form->get('confirm')); ?>
+</p>
 <p>
 <?php echo $this->formRow($form->get('ime')); ?>
 </p>
@@ -27,12 +36,7 @@ echo $this->formRow($form->get('username'));
 <?php echo $this->formRow($form->get('prezime')); ?>
 </p>
 
-<p>
-<?php echo $this->formRow($form->get('role')); ?>
-</p>
-<p>
-<?php echo $this->formRow($form->get('active')); ?>
-</p>
+
 
 
     </div>
@@ -70,6 +74,3 @@ echo $this->form()->closeTag();
 ?>
 </div>
 </div>
-
-
-

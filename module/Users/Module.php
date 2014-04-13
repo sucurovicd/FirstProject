@@ -14,8 +14,11 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Users\Acl\Acl;
 
+
 class Module implements AutoloaderProviderInterface
 {
+   
+   
     public function getAutoloaderConfig()
     {
         return array(
@@ -39,7 +42,11 @@ class Module implements AutoloaderProviderInterface
 		$application = $e->getApplication();
 		$em = $application->getEventManager();
 		$em->attach('route', array($this, 'onRoute'), -100);
+                
+              
+               
 	}
+        
 	
 	// WORKING the main engine for ACL
 	public function onRoute(\Zend\EventManager\EventInterface $e) // Event manager of the app
@@ -90,6 +97,7 @@ class Module implements AutoloaderProviderInterface
 			exit;
 		}
 	}
+       
 
     
 }

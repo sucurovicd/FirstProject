@@ -12,14 +12,18 @@ return array(
             'Users\Controller\Users' =>array(
               'index' => 'admin',
               'update' => 'admin',
-              'delete' => 'admin',  
+              'delete' => 'admin', 
+              'register' => 'admin',
+              'success' => 'admin',
             ),
             'Application\Controller\Index' => array(
                'all' => 'guest', 
             ),
             'Auth\Controller\Auth' => array(
                 'index' => 'guest',
-                'logout' => 'user'
+                'logout' => 'user',
+                
+                
             ),
             
             
