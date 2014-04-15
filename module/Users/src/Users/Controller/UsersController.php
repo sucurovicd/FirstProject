@@ -41,6 +41,7 @@ class UsersController extends AbstractActionController
               
 		$paginator->setCurrentPageNumber((int)$page);
 		$paginator->setItemCountPerPage(10);
+		
                 
 		return new ViewModel(array('paginator' => $paginator));
         
@@ -48,8 +49,8 @@ class UsersController extends AbstractActionController
 
     public function updateAction()
     {
-        $id = $this->params()->fromRoute('id');
-        if(!$id) $this->redirect ()->toRoute ('users', array('controller' => 'users', 'action' => 'index'));
+        $id = (int)$this->params()->fromRoute('id');
+        if(!$id || $id < 1) $this->redirect ()->toRoute ('users', array('controller' => 'users', 'action' => 'index'));
         $form = new UsersEditForm();
        $request = $this->getRequest();
        if($request->isPost()){
@@ -76,8 +77,8 @@ class UsersController extends AbstractActionController
         
     public function deleteAction(){
         
-        $id = $this->params()->fromRoute('id');
-        if(!$id) $this->redirect ()->toRoute ('users');
+        $id = (int) $this->params()->fromRoute('id');
+        if(!$id || $id < 1) $this->redirect ()->toRoute ('users');
         $this->getModel()->getUsersTable()->delete(array('id' => $id));
         
        return $this->redirect()->toRoute('users/default', array('controoler' => 'users', 'action' => 'index'));  
@@ -111,22 +112,30 @@ class UsersController extends AbstractActionController
                 $data['password'] = $blockCipher->encrypt($data['password']);
                 $this->getModel()->getUsersTable()->insert($data);
                 $user = $this->getModel()->getUsersTable()->select(array('username' => $data['username']))->current();
+               
                 
                 
                 $nas_mail = $config['email_nas'];
                 $site = $config['site_name'];
-                $body = '<h1>Potvrdite email na '. $site .'</h1>'
-                        . '<p>Dobrodosli na web sajt '.$site.', kako bi ste aktivirali vas nalog potrebno je da potvrdite email. To mozete uciniti tako '
-                        . 'sto ce te kliknuti na link koji smo vam prilozili ispod.</p>'
-                        . '<p><a href="http://popusti.rs/aktivacija/'.$user->id.'/'.$user->reg_token.'">http://popusti.rs/aktivacija/'.$user->id.'/'.$user->reg_token.'</a></p>';
                 
-                  
+                
+                $transport = $this->getServiceLocator()->get('mail.transport');
+                 
                 $message =  new Message();
+                
+                $this->getRequest()->getServer();
                 
                 $message->addFrom($nas_mail)
                         ->addTo($user->email)
                         ->setSubject("Registracija na". $site)
-                        ->setBody($body);
+                        ->setBody("Kliknite na link kako bi ste dovrsili registraciju na web sajtu popusti => " . 
+					$this->getRequest()->getServer('HTTP_ORIGIN') .
+					$this->url()->fromRoute('users/default', array(
+						'controller' => 'users', 
+						'action' => 'confirmEmail', 
+						'id' => $user->reg_token)));
+                
+                $transport->send($message);
                 
               return $this->redirect()->toRoute('users/default', array('controller' => 'users', 'action' => 'success'));
                 
@@ -140,6 +149,33 @@ class UsersController extends AbstractActionController
         
         return new ViewModel(array('form' => $form));
         
+    }
+    
+    public function confirmEmailAction(){
+    	
+    	$token = $this->params()->fromRoute('id');
+    	$view = new ViewModel();
+    	
+    	
+    		$user = $this->getModel()->getUserByToken($token);
+    		if($user == false){
+    			return $this->redirect()->toRoute('users/default', array('controller' => 'users', 'action' => 'errorConfirm'));
+    			exit();
+    		}
+    		if($user->active == 1){
+    			return $this->redirect()->toRoute('users/default', array('controller' => 'users', 'action' => 'errorConfirm'));
+    			exit();
+    		}
+    			
+    		
+    		$user_id = $user->id;
+    		
+    		$this->getModel()->activateUser($user_id);
+    		
+    	
+    	
+    	return $view;
+    	
     }
     public function successAction(){
         
@@ -156,4 +192,11 @@ class UsersController extends AbstractActionController
         
         
     }
+    public function errorConfirmAction(){
+    	return new ViewModel();
+    }
+    public function forgotenPasswordAction(){
+    	$form = "form";
+    }
 }
+

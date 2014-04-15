@@ -43,4 +43,17 @@ class User {
         $users = $this->getUsersTable()->select();
         return $users;
     }
+    public function getUserByToken($token){
+    	$rowset = $this->getUsersTable()->select(array('reg_token' => $token));
+    	$row = $rowset->current();
+    	if (!$row) {
+  			$row = false;
+    	}
+    	
+    	return $row;
+    }
+    public function activateUser($id){
+    	$data['active'] = 1;
+    	$this->getUsersTable()->update($data,array('id' => $id));
+    }
 }

@@ -13,6 +13,9 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Users\Acl\Acl;
+use Zend\ServiceManager\ServiceManager;
+use Zend\Mail\Transport\Smtp;
+use Zend\Mail\Transport\SmtpOptions;
 
 
 class Module implements AutoloaderProviderInterface
@@ -96,6 +99,32 @@ class Module implements AutoloaderProviderInterface
 			$response->sendHeaders();
 			exit;
 		}
+	}
+	public function getServiceConfig(){
+		 return array(
+            'factories' => array(
+				/*// For Yable data Gateway
+                'Auth\Model\UsersTable' =>  function($sm) {
+                    $tableGateway = $sm->get('UsersTableGateway');
+                    $table = new UsersTable($tableGateway);
+                    return $table;
+                },
+                'UsersTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Auth()); // Notice what is set here
+                    return new TableGateway('users', $dbAdapter, null, $resultSetPrototype);
+                },
+                */
+				// Add this for SMTP transport
+				'mail.transport' => function (ServiceManager $serviceManager) {
+					$config = $serviceManager->get('Config'); 
+					$transport = new Smtp();                
+					$transport->setOptions(new SmtpOptions($config['mail']['transport']['options']));
+					return $transport;
+				},
+            ),
+        );
 	}
        
 

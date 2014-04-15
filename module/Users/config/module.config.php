@@ -26,7 +26,7 @@ return array(
 							'constraints' => array(
 								'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
 								'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
-								'id'     	 => '[0-9]*',
+								'id'     	 => '[0-9a-zA-Z_-]*',
 							),
 							'defaults' => array(
 							),
