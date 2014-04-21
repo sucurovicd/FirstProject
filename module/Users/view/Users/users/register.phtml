@@ -61,6 +61,13 @@ echo $this->formRow($form->get('username'));
 	</div>
 	</div>
 	<div class="row well">
+		<div class="col-md 4"></div>
+		<div class="col-md 4"><?php echo $this->formRow($form->get('captcha')); 
+		echo $this->formHidden($form->get('secret'));?></div>
+		<div class="col-md 4"></div>
+	
+	</div> 
+	<div class="row well">
 	<div class="col-md-12" style="text-align:center;">
 	<p>
 <?php echo $this->formRow($form->get('submit')); ?>

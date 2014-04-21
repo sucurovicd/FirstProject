@@ -19,6 +19,10 @@ use Users\Form\RegisterFilter;
 use Zend\Crypt\BlockCipher;
 use Zend\Crypt\Symmetric\Mcrypt;
 use Zend\Mail\Message;
+use Users\Form\ForgotenPassForm;
+use Users\Form\ForgotenPassFilter;
+use Users\Form\ChangePassForm;
+use Users\Form\ChangePassFilter;
 
 
 
@@ -103,13 +107,14 @@ class UsersController extends AbstractActionController
                $data['date_created'] = date('Y-m-d H:i:s');
                unset($data['submit']);
                unset($data['confirm']);
+               unset($data['captcha']);
+               unset($data['secret']);
                $config = $sm->get('Config');
-               $salt = $config['static_salt'];
+               
 
 
-                $blockCipher = new BlockCipher(new Mcrypt(array('algo' => 'aes')));
-                $blockCipher->setKey($salt);
-                $data['password'] = $blockCipher->encrypt($data['password']);
+                
+                $data['password'] = $this->encryptPass($data['password']);
                 $this->getModel()->getUsersTable()->insert($data);
                 $user = $this->getModel()->getUsersTable()->select(array('username' => $data['username']))->current();
                
@@ -195,8 +200,123 @@ class UsersController extends AbstractActionController
     public function errorConfirmAction(){
     	return new ViewModel();
     }
-    public function forgotenPasswordAction(){
-    	$form = "form";
+     public function forgotenPasswordAction(){
+    	$form = new ForgotenPassForm();
+    	
+    	$request = $this->getRequest();
+    	
+    	if($request->isPost()){
+            $sm = $this->getServiceLocator();
+            $adapter = $sm->get('Zend\Db\Adapter\Adapter');
+    		$form->setInputFilter(new ForgotenPassFilter($adapter, $this->getServiceLocator()));
+    		$form->setData($request->getPost());
+    		if($form->isValid()){
+                    $data = $form->getData();
+                    
+                    
+               unset($data['submit']);
+                unset($data['captcha']);
+                unset($data['secret']);
+                
+               
+                    
+                
+                    
+                    
+                    $user = $this->getModel()->getUserByEmail($data['email']);
+                    
+                    
+                    
+                    
+                    
+                    
+                    if($user == false){
+                       return  $this->redirect()->toRoute('home', array('controller' => 'index', 'action' => 'index'));
+                       exit();
+                    }
+                    // mail i pass
+                    
+                    $pass = $this->generateDynamicSalt();
+                   
+
+
+               
+                $data['password'] = $this->encryptPass($pass);
+               
+                
+               
+                
+                
+              
+                    
+                $this->getModel()->getUsersTable()->update($data, array('id' => $user->id));
+                $config = $sm->get('Config');   
+                $nas_mail = $config['email_nas'];
+                $site = $config['site_name'];
+                
+                
+                $transport = $sm->get('mail.transport');
+                 
+                $message =  new Message();
+                
+                $this->getRequest()->getServer();
+                
+                $message->addFrom($nas_mail)
+                        ->addTo($user->email)
+                        ->setSubject("Registracija na". $site)
+                        ->setBody("Reset passworda na ". $site ."</h1>
+                        Uspesno ste resetovali password, vas novi password je: ".$pass);
+                
+                $transport->send($message);
+                return $this->redirect()->toRoute('home', array('controller' => 'index', 'action' => 'index'));
+                    
+    			
+    		}
+    	}
+    	
+    	return new ViewModel(array('form' => $form));
     }
+    
+    public function changePasswordAction(){
+        $form = new ChangePassForm();
+        $request = $this->getRequest();
+        if($request->isPost()){
+            $sm = $this->getServiceLocator();
+            
+            $form->setInputFilter(new ChangePassFilter($sm));
+            $form->setData($request->getPost());
+            
+            if($form->isValid()){
+                $data = $form->getData();
+                
+                
+                
+            }
+        }
+        
+        return new ViewModel(array('form' => $form));
+    }
+    public function generateDynamicSalt()
+    {
+    	$dynamicSalt = '';
+    	for ($i = 0; $i < 50; $i++) {
+    		$dynamicSalt .= chr(rand(33, 126));
+    	}
+    	$predizlaz = md5($dynamicSalt);
+    	$izlaz = substr($predizlaz, 0, 10);
+    	return $izlaz;
+    }
+    private function encryptPass($password){
+                    $sm = $this->getServiceLocator();
+                    $config = $sm->get('Config');
+                    $salt = $config['static_salt'];
+                    $pass_1= md5($salt) . sha1($password);
+                    $pass = sha1($pass_1);
+                    
+                    return $pass;
+        
+    }
+    
+    
 }
 

@@ -132,6 +132,23 @@ class RegisterForm extends Form
          'label' => 'Tel:', 
        ),
    ));
+       $this->add(array(
+       		'type' => 'Zend\Form\Element\Captcha',
+       		'name' => 'captcha',
+       		'options' => array(
+       				'label' => 'Potvrdi da si covek',
+       				'captcha' => new \Zend\Captcha\Figlet(),
+       		),
+       ));
+       $this->add(array(
+    'type' => 'Zend\Form\Element\Csrf',
+    'name' => 'secret',
+    'options' => array(
+        'csrf_options' => array(
+            'timeout' => 600
+        )
+    )
+));
  
 
         

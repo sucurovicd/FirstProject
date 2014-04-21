@@ -16,6 +16,8 @@ use Auth\Form\LoginFilter;
 use Zend\Authentication\Result;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Storage\Session as SessionStorage;
+use Zend\Crypt\BlockCipher;
+use Zend\Crypt\Symmetric\Mcrypt;
 
 use Zend\Db\Adapter\Adapter as DbAdapter;
 
@@ -44,12 +46,23 @@ class AuthController extends AbstractActionController
                $data = $form->getData();
                $sm = $this->getServiceLocator();
                $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+               $config = $sm->get('Config');
+               $salt = $config['static_salt'];
+               $data['password'] = md5($salt).sha1($data['password']);
+               
+              
+               
+               
+               
                
                
                $authAdapter = new AuthAdapter($dbAdapter,
                        'users',
                        'username',
-                       'password'
+                       'password',
+                       "SHA1(?) AND active = 1"
+                      
+                       
                        
                       );
                $authAdapter->setIdentity($data['username'])
@@ -90,7 +103,7 @@ class AuthController extends AbstractActionController
 				}
                                 foreach ($result->getMessages() as $message) {
 					$messages .= "$message\n";
-                                }
+                               } 
            }
         }
         return array(
@@ -112,5 +125,16 @@ class AuthController extends AbstractActionController
 
 
 		return $this->redirect()->toRoute('auth/default', array('controller' => 'auth', 'action' => 'index'));		
-	}	
+	}
+     private function encPass($pass){
+	                $sm = $this->getServiceLocator();
+                    
+                    
+
+
+                $blockCipher = new BlockCipher(new Mcrypt(array('algo' => 'aes')));
+                $blockCipher->setKey($salt);
+                $password = $blockCipher->encrypt($pass);
+                return $password;
+	}
 }
