@@ -288,12 +288,12 @@ class UsersController extends AbstractActionController
             
             if($form->isValid()){
                 $data = $form->getData();
-                unset($data['confirm_password'])
+                unset($data['confirm_password']);
                 unset($data['captcha']);
                 unset($data['secret']);
                 unset($data['submit']);
 
-                $data['password'] = $this->encryptPass($data['password'])
+                $data['password'] = $this->encryptPass($data['password']);
 
                 $auth = new AuthenticationService();
 
