@@ -288,6 +288,28 @@ class UsersController extends AbstractActionController
             
             if($form->isValid()){
                 $data = $form->getData();
+                unset($data['confirm_password'])
+                unset($data['captcha']);
+                unset($data['secret']);
+                unset($data['submit']);
+
+                $data['password'] = $this->encryptPass($data['password'])
+
+                $auth = new AuthenticationService();
+
+                if($auth->hasIdentity()){
+
+                    $user = $auth->getStorage()->read();
+
+                    $userId = $user->id;
+
+                    $this->getModel()->getUsersTable()->update($data, array('id' => $userId));
+
+                        //Za sada posle obavezno promeniti!!!!
+                   return $this->redirect()->toRoute('users/default', array('controller' => 'users' , 'action' => 'index' ));
+                }else{
+                    return $this->redirect()->toRoute('home');
+                }
                 
                 
                 
