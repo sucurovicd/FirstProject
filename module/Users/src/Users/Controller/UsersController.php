@@ -24,6 +24,8 @@ use Users\Form\ForgotenPassFilter;
 use Users\Form\ChangePassForm;
 use Users\Form\ChangePassFilter;
 use Zend\Authentication\AuthenticationService;
+use Users\Form\ProfileForm;
+use Users\Form\ProfileFilter;
 
 
 
@@ -201,7 +203,8 @@ class UsersController extends AbstractActionController
     public function errorConfirmAction(){
     	return new ViewModel();
     }
-     public function forgotenPasswordAction(){
+     
+    public function forgotenPasswordAction(){
     	$form = new ForgotenPassForm();
     	
     	$request = $this->getRequest();
@@ -320,6 +323,52 @@ class UsersController extends AbstractActionController
         
         return new ViewModel(array('form' => $form));
     }
+
+     public function profileAction(){
+             
+             $auth = new AuthenticationService();
+             if($auth->hasIdentity()){
+             $storage = $auth->getStorage()->read();
+             $userId = $storage->id;
+
+             $userData = $this->getModel()->getUsersTable()->select(array('id' => $userId))->current();
+
+             
+
+         
+            $form = new ProfileForm($userData);
+            
+            $request = $this->getRequest();
+          
+            if($request->isPost()){
+                $sm = $this->getServiceLocator();
+                $form->setInputFilter(new ProfileFilter($sm));
+                $form->setData($request->getPost());
+                if($form->isValid()){
+                    
+                $data = $form->getData();
+                 
+                   unset($data['submit']);
+                   unset($data['secret']);
+
+                   $this->getModel()->getUsersTable()->update($data, array('id' => $userData->id));
+
+                   return $this->redirect()->toRoute('users/default', array('controller' => 'users', 'action' => 'profile'));
+
+                    
+                }
+            }
+            
+            
+            return new ViewModel(array('form' => $form));
+
+        }else{
+            return $this->redirect()->toRoute('home');
+            
+        }
+        }
+
+
     public function generateDynamicSalt()
     {
     	$dynamicSalt = '';

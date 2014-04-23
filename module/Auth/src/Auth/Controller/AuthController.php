@@ -137,4 +137,6 @@ class AuthController extends AbstractActionController
                 $password = $blockCipher->encrypt($pass);
                 return $password;
 	}
+
+
 }
