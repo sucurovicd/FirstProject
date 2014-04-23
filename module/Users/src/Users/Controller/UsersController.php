@@ -23,6 +23,7 @@ use Users\Form\ForgotenPassForm;
 use Users\Form\ForgotenPassFilter;
 use Users\Form\ChangePassForm;
 use Users\Form\ChangePassFilter;
+use Zend\Authentication\AuthenticationService;
 
 
 
@@ -294,6 +295,7 @@ class UsersController extends AbstractActionController
                 unset($data['submit']);
 
                 $data['password'] = $this->encryptPass($data['password']);
+                
 
                 $auth = new AuthenticationService();
 
@@ -338,7 +340,9 @@ class UsersController extends AbstractActionController
                     return $pass;
         
     }
+
+
     
-    
+   
 }
 

@@ -15,6 +15,9 @@ return array(
               'delete' => 'admin', 
               'register' => 'admin',
               'success' => 'admin',
+              'changePassword' => 'admin',
+              
+              //'all' => 'guest',
             ),
             'Application\Controller\Index' => array(
                'all' => 'guest', 

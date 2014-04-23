@@ -7,7 +7,7 @@ return array(
 				'connection_class'  => 'plain',
 				'connection_config' => array(
 					'username' => 'nenadpaic@gmail.com',
-					'password' => '',
+					'password' => 'elcapetano123',
 					'ssl' => 'tls'
 				),
 			),  
